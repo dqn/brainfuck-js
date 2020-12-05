@@ -28,4 +28,11 @@ describe("interpret", () => {
     }).toThrow(new Error("exceeded max steps"));
     expect(bf.getMemory()).toEqual([1, 20]);
   });
+
+  it("nextStep", () => {
+    const bf = createInterpreter("++++++++[>++++++++<-]>+.");
+    while (bf.nextStep());
+    const out = bf.getOutput();
+    expect(out).toBe("A");
+  });
 });

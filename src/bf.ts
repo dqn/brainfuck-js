@@ -7,7 +7,7 @@ type Interpreter = {
   getMemoryIndex(): number;
   getOutput(): string;
   interpret(): string;
-  nextStep(): void;
+  nextStep(): boolean;
 };
 
 type InterpreterOptions = {
@@ -28,18 +28,20 @@ export function createInterpreter(
   const maxSteps = options?.maxSteps ?? Number.POSITIVE_INFINITY;
 
   const interpret = (): string => {
-    for (let steps = 0; srcIndex !== src.length; ++steps) {
+    for (let steps = 0; nextStep(); ++steps) {
       if (steps > maxSteps) {
         throw new Error("exceeded max steps");
       }
-
-      nextStep();
     }
 
     return output;
   };
 
-  const nextStep = () => {
+  const nextStep = (): boolean => {
+    if (srcIndex === src.length) {
+      return false;
+    }
+
     switch (src[srcIndex++]) {
       case ">": {
         incrementDataPointer();
@@ -74,6 +76,8 @@ export function createInterpreter(
         break;
       }
     }
+
+    return srcIndex !== src.length;
   };
 
   const incrementDataPointer = () => {
