@@ -1,7 +1,7 @@
 {
-  "name": "brainfuck-js",
+  "name": "@dqn/brainfuck-js",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
