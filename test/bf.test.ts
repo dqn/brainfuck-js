@@ -35,4 +35,14 @@ describe("interpret", () => {
     const out = bf.getOutput();
     expect(out).toBe("A");
   });
+
+  it("init", () => {
+    const bf = createInterpreter("+");
+    bf.interpret();
+    expect(bf.getMemory()).toEqual([1]);
+    bf.init();
+    expect(bf.getMemory()).toEqual([0]);
+    bf.interpret();
+    expect(bf.getMemory()).toEqual([1]);
+  });
 });

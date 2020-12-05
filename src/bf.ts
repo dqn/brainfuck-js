@@ -6,6 +6,7 @@ type Interpreter = {
   getMemory(): number[];
   getMemoryIndex(): number;
   getOutput(): string;
+  init(): void;
   interpret(): string;
   nextStep(): boolean;
 };
@@ -19,13 +20,22 @@ export function createInterpreter(
   src: string,
   options?: InterpreterOptions,
 ): Interpreter {
-  let srcIndex: number = 0;
-  let memory: number[] = [0];
-  let memoryIndex: number = 0;
-  let output: string = "";
+  // MUST BE INITIALIZED IN `init`
+  let srcIndex: number;
+  let memory: number[];
+  let memoryIndex: number;
+  let output: string;
+  let input: string;
 
-  let input: string = options?.input ?? "";
   const maxSteps = options?.maxSteps ?? Number.POSITIVE_INFINITY;
+
+  const init = () => {
+    srcIndex = 0;
+    memory = [0];
+    memoryIndex = 0;
+    output = "";
+    input = options?.input ?? "";
+  };
 
   const interpret = (): string => {
     for (let steps = 0; nextStep(); ++steps) {
@@ -184,12 +194,15 @@ export function createInterpreter(
     return output;
   };
 
+  init();
+
   return {
     getSrc,
     getSrcIndex,
     getMemory,
     getMemoryIndex,
     getOutput,
+    init,
     interpret,
     nextStep,
   };
