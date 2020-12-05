@@ -1,116 +1,113 @@
 export type Command = ">" | "<" | "+" | "-" | "." | "," | "[" | "]";
 
-export class Brainfuck {
-  private srcIndex: number;
-  private memory: number[];
-  private memoryIndex: number;
-  private input: string;
-  private output: string;
+type Interpreter = {
+  interpret: () => string;
+  nextStep: () => void;
+};
 
-  constructor(public src: string) {
-    this.srcIndex = 0;
-    this.memory = [0];
-    this.memoryIndex = 0;
-    this.input = "";
-    this.output = "";
-  }
+export function createInterpreter(src: string): Interpreter {
+  let srcIndex: number = 0;
+  let memory: number[] = [0];
+  let memoryIndex: number = 0;
+  let input: string = "";
+  let output: string = "";
 
-  public interpret(): string {
-    while (this.srcIndex !== this.src.length) {
-      this.nextStep();
+  const interpret = (): string => {
+    while (srcIndex !== src.length) {
+      nextStep();
     }
 
-    return this.output;
-  }
+    return output;
+  };
 
-  public nextStep() {
-    switch (this.src[this.srcIndex++]) {
+  const nextStep = () => {
+    switch (src[srcIndex++]) {
       case ">": {
-        this.incrementDataPointer();
+        incrementDataPointer();
         break;
       }
       case "<": {
-        this.decrementDataPointer();
+        decrementDataPointer();
         break;
       }
       case "+": {
-        this.incrementByteAtDataPointer();
+        incrementByteAtDataPointer();
         break;
       }
       case "-": {
-        this.decrementByteAtDataPointer();
+        decrementByteAtDataPointer();
         break;
       }
       case ".": {
-        this.outputByteAtDataPointer();
+        outputByteAtDataPointer();
         break;
       }
       case ",": {
-        this.inputByteAtDataPointer();
+        inputByteAtDataPointer();
         break;
       }
       case "[": {
-        this.beginLoop();
+        beginLoop();
         break;
       }
       case "]": {
-        this.endLoop();
+        endLoop();
         break;
       }
     }
-  }
+  };
 
-  private incrementDataPointer() {
-    if (this.memoryIndex === this.memory.length - 1) {
-      this.memory = [...this.memory, 0];
+  const incrementDataPointer = () => {
+    if (memoryIndex === memory.length - 1) {
+      memory = [...memory, 0];
     }
-    ++this.memoryIndex;
-  }
+    ++memoryIndex;
+  };
 
-  private decrementDataPointer() {
-    if (this.memoryIndex === 0) {
-      this.memory = [0, ...this.memory];
+  const decrementDataPointer = () => {
+    if (memoryIndex === 0) {
+      memory = [0, ...memory];
     } else {
-      --this.memoryIndex;
+      --memoryIndex;
     }
-  }
+  };
 
-  private incrementByteAtDataPointer() {
-    this.memory[this.memoryIndex] = (this.memory[this.memoryIndex] + 1) % 0xff;
-  }
+  const incrementByteAtDataPointer = () => {
+    memory[memoryIndex] = (memory[memoryIndex] + 1) % 0xff;
+  };
 
-  private decrementByteAtDataPointer() {
-    this.memory[this.memoryIndex] = (this.memory[this.memoryIndex] - 1) % 0xff;
-  }
+  const decrementByteAtDataPointer = () => {
+    memory[memoryIndex] = (memory[memoryIndex] - 1) % 0xff;
+  };
 
-  private outputByteAtDataPointer() {
-    this.output += this.memory[this.memoryIndex].toString();
-  }
+  const outputByteAtDataPointer = () => {
+    output += memory[memoryIndex].toString();
+  };
 
-  private inputByteAtDataPointer() {
-    if (this.input.length) {
-      this.memory[this.memoryIndex] = this.input[0].charCodeAt(0);
-      this.input = this.input.slice(1);
+  const inputByteAtDataPointer = () => {
+    if (input.length) {
+      memory[memoryIndex] = input[0].charCodeAt(0);
+      input = input.slice(1);
     } else {
-      this.memory[this.memoryIndex] = 0;
+      memory[memoryIndex] = 0;
     }
-  }
+  };
 
-  private beginLoop() {
-    if (this.memory[this.memoryIndex]) {
+  const beginLoop = () => {
+    if (memory[memoryIndex]) {
       return;
     }
 
     for (let depth = 0; ; ) {
-      if (this.srcIndex === this.src.length - 1) {
+      if (srcIndex === src.length - 1) {
         throw new Error(`matching "]" is not found`);
       }
 
-      ++this.srcIndex;
+      ++srcIndex;
 
-      if (this.src[this.srcIndex] === "[") {
+      if (src[srcIndex] === "[") {
         ++depth;
-      } else if (this.src[this.srcIndex] === "]") {
+      } else if (src[srcIndex] === "]") {
         --depth;
 
         if (!depth) {
@@ -118,23 +115,23 @@ export class Brainfuck {
         }
       }
     }
-  }
+  };
 
-  private endLoop() {
-    if (!this.memory[this.memoryIndex]) {
+  const endLoop = () => {
+    if (!memory[memoryIndex]) {
       return;
     }
 
     for (let depth = 0; ; ) {
-      if (this.srcIndex === 0) {
+      if (srcIndex === 0) {
         throw new Error(`matching "[" is not found`);
       }
 
-      --this.srcIndex;
+      --srcIndex;
 
-      if (this.src[this.srcIndex] === "]") {
+      if (src[srcIndex] === "]") {
         ++depth;
-      } else if (this.src[this.srcIndex] === "[") {
+      } else if (src[srcIndex] === "[") {
         --depth;
 
         if (!depth) {
@@ -142,5 +139,10 @@ export class Brainfuck {
         }
       }
     }
-  }
+  };
+
+  return {
+    interpret,
+    nextStep,
+  };
 }
