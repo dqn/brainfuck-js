@@ -1,19 +1,38 @@
 export type Command = ">" | "<" | "+" | "-" | "." | "," | "[" | "]";
 
 type Interpreter = {
-  interpret: () => string;
-  nextStep: () => void;
+  getSrc(): string;
+  getSrcIndex(): number;
+  getMemory(): number[];
+  getMemoryIndex(): number;
+  getOutput(): string;
+  interpret(): string;
+  nextStep(): void;
 };
 
-export function createInterpreter(src: string): Interpreter {
+type InterpreterOptions = {
+  input?: string;
+  maxSteps?: number;
+};
+
+export function createInterpreter(
+  src: string,
+  options?: InterpreterOptions,
+): Interpreter {
   let srcIndex: number = 0;
   let memory: number[] = [0];
   let memoryIndex: number = 0;
-  let input: string = "";
   let output: string = "";
 
+  let input: string = options?.input ?? "";
+  const maxSteps = options?.maxSteps ?? Number.POSITIVE_INFINITY;
+
   const interpret = (): string => {
-    while (srcIndex !== src.length) {
+    for (let steps = 0; srcIndex !== src.length; ++steps) {
+      if (steps > maxSteps) {
+        throw new Error("exceeded max steps");
+      }
+
       nextStep();
     }
 
@@ -81,7 +100,7 @@ export function createInterpreter(src: string): Interpreter {
   };
 
   const outputByteAtDataPointer = () => {
-    output += memory[memoryIndex].toString();
+    output += String.fromCharCode(memory[memoryIndex]);
   };
 
   const inputByteAtDataPointer = () => {
@@ -141,7 +160,32 @@ export function createInterpreter(src: string): Interpreter {
     }
   };
 
+  const getSrc = (): string => {
+    return src;
+  };
+
+  const getSrcIndex = (): number => {
+    return srcIndex;
+  };
+
+  const getMemory = (): number[] => {
+    return memory;
+  };
+
+  const getMemoryIndex = (): number => {
+    return memoryIndex;
+  };
+
+  const getOutput = (): string => {
+    return output;
+  };
+
   return {
+    getSrc,
+    getSrcIndex,
+    getMemory,
+    getMemoryIndex,
+    getOutput,
     interpret,
     nextStep,
   };
