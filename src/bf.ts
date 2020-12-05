@@ -52,29 +52,35 @@ export function createInterpreter(
       return false;
     }
 
-    switch (src[srcIndex++]) {
+    switch (src[srcIndex]) {
       case ">": {
         incrementDataPointer();
+        ++srcIndex;
         break;
       }
       case "<": {
         decrementDataPointer();
+        ++srcIndex;
         break;
       }
       case "+": {
         incrementByteAtDataPointer();
+        ++srcIndex;
         break;
       }
       case "-": {
         decrementByteAtDataPointer();
+        ++srcIndex;
         break;
       }
       case ".": {
         outputByteAtDataPointer();
+        ++srcIndex;
         break;
       }
       case ",": {
         inputByteAtDataPointer();
+        ++srcIndex;
         break;
       }
       case "[": {
@@ -128,15 +134,14 @@ export function createInterpreter(
 
   const beginLoop = () => {
     if (memory[memoryIndex]) {
+      ++srcIndex;
       return;
     }
 
-    for (let depth = 0; ; ) {
-      if (srcIndex === src.length - 1) {
+    for (let depth = 0; ; ++srcIndex) {
+      if (srcIndex === src.length) {
         throw new Error(`matching "]" is not found`);
       }
-
-      ++srcIndex;
 
       if (src[srcIndex] === "[") {
         ++depth;
@@ -152,15 +157,14 @@ export function createInterpreter(
 
   const endLoop = () => {
     if (!memory[memoryIndex]) {
+      ++srcIndex;
       return;
     }
 
-    for (let depth = 0; ; ) {
+    for (let depth = 0; ; --srcIndex) {
       if (srcIndex === 0) {
         throw new Error(`matching "[" is not found`);
       }
-
-      --srcIndex;
 
       if (src[srcIndex] === "]") {
         ++depth;

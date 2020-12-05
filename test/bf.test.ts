@@ -45,4 +45,10 @@ describe("interpret", () => {
     bf.interpret();
     expect(bf.getMemory()).toEqual([1]);
   });
+
+  it("empty loop", () => {
+    const bf = createInterpreter("[]");
+    const out = bf.interpret();
+    expect(out).toBe("");
+  });
 });
